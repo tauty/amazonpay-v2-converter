@@ -28,7 +28,14 @@ You can easily convert v1 into v2 by just using this sample code.
 ##### wait until all events are completed...
 <img src="https://user-images.githubusercontent.com/61146815/75363170-1590c200-58fd-11ea-99b5-00c4f9d9ff91.png" width="500px">
 
-##### 
+##### get `API Endpoint` and `API Key` after all events are completed
+
+###### API Endpoint
+<img src="https://user-images.githubusercontent.com/61146815/75364199-a5833b80-58fe-11ea-871c-1c741ead3c60.png" width="500px">
+
+###### API Key
+<span><img src="https://user-images.githubusercontent.com/61146815/75364312-e11e0580-58fe-11ea-9cd7-a59dd0b0ed95.png" width="500px"><img src="https://user-images.githubusercontent.com/61146815/75364465-204c5680-58ff-11ea-983a-d1b2871d9e79.png" width="200px">
+</span>
 
 ### 2. Download [amazonpayV2Converter.js](https://XXX/amazonpayV2Converter.js) Add the script tags on your EC site
 #### 2-1. Add the script tags on the Cart Page with Amazon Pay Button
