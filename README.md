@@ -49,8 +49,8 @@ curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --head
 
 <br/>
 
-### 2. 
-#### 2-1. implement source codes to execute this api on your server
+### 2. implement source codes to execute this api on your server
+
 You can check [how to request this api](https://github.com/amazonpay-labs/amazonpay-v2-handler)
 
 ```
