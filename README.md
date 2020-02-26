@@ -7,7 +7,7 @@ You can easily convert v1 into v2 by just using this sample code.
 
 ## How To Use
 ### 1. Prepare Amazon Pay V2 API on AWS lambda & API Gateway
-#### 1-1. click this button and deploy Amazon Pay V2 API on AWS
+#### 1-1. click this button and deploy Amazon Pay V2 API on your AWS account
 [![image](https://user-images.githubusercontent.com/61146815/75247856-3e8a5780-5816-11ea-9cf9-54c46a650c53.png)
 ](https://console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/new?stackName=v2handler&templateURL=https://amazonpay-v2-handler.s3-ap-northeast-1.amazonaws.com/v2handler-api.yml)
 
