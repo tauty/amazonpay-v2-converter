@@ -34,7 +34,7 @@ You can easily convert v1 into v2 by just using this sample code.
 <img src="https://user-images.githubusercontent.com/61146815/75364199-a5833b80-58fe-11ea-871c-1c741ead3c60.png" width="500px">
 
 ###### API Key
-<span><img src="https://user-images.githubusercontent.com/61146815/75364312-e11e0580-58fe-11ea-9cd7-a59dd0b0ed95.png" width="500px"><img src="https://user-images.githubusercontent.com/61146815/75364465-204c5680-58ff-11ea-983a-d1b2871d9e79.png" width="200px">
+<span><img src="https://user-images.githubusercontent.com/61146815/75365773-01e75a80-5901-11ea-867a-0d8bb7d57bf5.png" width="500px"><img src="https://user-images.githubusercontent.com/61146815/75364465-204c5680-58ff-11ea-983a-d1b2871d9e79.png" width="200px">
 </span>
 
 ##### test the connection by using `API Endpoint` and `API Key`
