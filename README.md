@@ -44,13 +44,59 @@ You can easily convert v1 into v2 by just using this sample code.
 curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --header 'x-api-key:${API Key}' ${API Endpoint}
 
 ex.
-curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --header 'x-api-key:aANxXXXXXXXXXXXXXXXXXXXXXXXXXX' https://XXXXXXXXX.execute-api.ap-northeast-1.amazonaws.com/Prod/
+curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --header 'x-api-key:XXXXXXXXXXXXXXXXXXXXXXXXXX' https://XXXXXXXXX.execute-api.ap-northeast-1.amazonaws.com/Prod/
 ```
 
 <br/>
 
-### 2. Download [amazonpayV2Converter.js](https://XXX/amazonpayV2Converter.js) Add the script tags on your EC site
-#### 2-1. Add the script tags on the Cart Page with Amazon Pay Button
+### 2. 
+#### 2-1. implement source codes to execute this api on your server
+You can check [how to request this api](https://github.com/amazonpay-labs/amazonpay-v2-handler)
+
+```
+if you use PHP on your server ...
+
+ex. execute Create Checkout Session API
+<?php
+
+    $result = execute('https://XXXXXXXXX.execute-api.ap-northeast-1.amazonaws.com/Prod', array("action" => "create"));
+    echo $result;
+
+
+    function execute($url, $requestJson) {
+
+        $header = [
+            'Content-Type: application/json',
+            'x-api-key: XXXXXXXXXXXXXXXXXXXXXXXXXX' # API Key
+        ];
+
+        $curl = curl_init();
+
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST'); // post
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($requestJson));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header); // header
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HEADER, true);
+        
+        $response = curl_exec($curl);
+        
+        $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE); 
+        $header = substr($response, 0, $header_size);
+        $body = substr($response, $header_size);
+        $result = json_decode($body, true); 
+        
+        curl_close($curl);
+
+        return json_encode($result);
+    }
+```
+
+<br/>
+
+### 3. Download [amazonpayV2Converter.js](https://XXX/amazonpayV2Converter.js) Add the script tags on your EC site
+#### 3-1. Add the script tags on the Cart Page with Amazon Pay Button
 
 ```
 ...
@@ -90,7 +136,7 @@ amazonpayV2Converter.sandbox().renderButton(createCheckoutSessionURL);
 ...
 ```
 
-#### 2-2. Add the script tags on the Cart Page with Amazon Pay Address Widgets or Wallet Widgets
+#### 3-2. Add the script tags on the Cart Page with Amazon Pay Address Widgets or Wallet Widgets
 
 ```
 <script type="text/javascript">
