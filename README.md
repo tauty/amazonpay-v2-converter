@@ -25,6 +25,11 @@ You can easily convert v1 into v2 by just using this sample code.
 ##### check these checkbox and click 'create stack' button
 <img src="https://user-images.githubusercontent.com/61146815/75250973-f6bafe80-581c-11ea-899e-63a4520749a3.png" width="500px">
 
+##### wait until all events are completed...
+<img src="https://user-images.githubusercontent.com/61146815/75363170-1590c200-58fd-11ea-99b5-00c4f9d9ff91.png" width="500px">
+
+##### 
+
 ### 2. Download [amazonpayV2Converter.js](https://XXX/amazonpayV2Converter.js) Add the script tags on your EC site
 #### 2-1. Add the script tags on the Cart Page with Amazon Pay Button
 
