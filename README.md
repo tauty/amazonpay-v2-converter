@@ -51,12 +51,14 @@ curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --head
 
 ### 2. implement source codes to execute this api on your server
 
-You can check [how to request this api](https://github.com/amazonpay-labs/amazonpay-v2-handler)
+* You can check [how to request this api](https://github.com/amazonpay-labs/amazonpay-v2-handler)
+
+<p>if you use PHP on your server ...<p>
+
+<p>ex. execute Create Checkout Session API</p>
+
 
 ```
-if you use PHP on your server ...
-
-ex. execute Create Checkout Session API
 <?php
 
     $result = execute('https://XXXXXXXXX.execute-api.ap-northeast-1.amazonaws.com/Prod', array("action" => "create"));
