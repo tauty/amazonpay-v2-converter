@@ -8,11 +8,11 @@ You can easily convert v1 into v2 by just using this sample code.
 ## How To Use
 ### 1. deploy Amazon Pay V2 API on your AWS
 
-#### 1-1. click this button
+#### 1-1. click this button and open CloudFormation on your AWS
 
 |region|button|
 |---|:---:|
-|ap-northeast-1|<a href="https://console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/new?stackName=v2handler&amp;templateURL=https://amazonpay-v2-handler.s3-ap-northeast-1.amazonaws.com/v2handler-api.yml" rel="nofollow" target="_blank"><img src="https://user-images.githubusercontent.com/61146815/75303877-48976f00-5885-11ea-98e0-ad390e8cb2e9.png" alt="image" style="max-width:100%;"></a>|
+|ap-northeast-1|[![image](https://user-images.githubusercontent.com/61146815/75303877-48976f00-5885-11ea-98e0-ad390e8cb2e9.png)](https://console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/new?stackName=v2handler&amp;templateURL=https://amazonpay-v2-handler.s3-ap-northeast-1.amazonaws.com/v2handler-api.yml)|
 
 #### 1-2. click 'next' button
 <img src="https://user-images.githubusercontent.com/61146815/75250132-01749400-581b-11ea-8b14-baf329cb5c4e.png" width="500px">
