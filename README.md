@@ -1,10 +1,17 @@
 # Amazon Pay V2 Converter
 You can easily convert v1 into v2 by just using this sample code.
 
-## 0. Contents
-[Requirements](#requirements)
+## Contents
+[1. Requirements](#1-requirements)
 
-[How To Use](#how-to-use)
+[2. How To Use](#2-how-to-use)
+
+[2-1. deploy Amazon Pay V2 API on your AWS](#2-1-deploy-amazon-pay-v2-api-on-your-aws)
+
+[2-2. implement source codes to execute this api on your server](#2-2-implement-source-codes-to-execute-this-api-on-your-server)
+
+[2-3. Download amazonpayV2Converter.js Add the script tags on your EC site](#2-3-download-amazonpayv2converterjs-add-the-script-tags-on-your-ec-site)
+
 
 ## 1. Requirements
 * implemented amazon pay based on [Code Generator](http://amzn.github.io/amazon-pay-sdk-samples/code_generator/?region=JP&ld=APJPLPADirect)
