@@ -195,6 +195,24 @@ amazonpayV2Converter.sandbox().showAddress(getCheckoutSessionURL, {
 
 <br/>
 
+## 3. Migrate from Sandbox to Production
+* Lambda環境変数をsandbox true -> false　へ変更
+* checkoutReviewReturnUrl　を本番URLへ変更
+* （おすすめ）API GatewayのリソースポリシーにIPアドレスを設定する方法をまとめる
+https://aws.amazon.com/jp/premiumsupport/knowledge-center/api-gateway-resource-policy-whitelist/
+
+<br/>
+
+## 4. Tips
+### 4-1. 本番と開発環境を分けたい場合の利用方法
+* 新たにcloudformationを使って、開発環境用のAPIを構築する
+
+### 4-2. エラーが発生した場合の調査方法
+* Forbbdenの場合
+* cloudwatchを見る方法
+
+<br/>
+
 ## License
 Amazon Pay V2 Converter is made available under the [MIT License](https://opensource.org/licenses/mit-license.php).
 
