@@ -32,10 +32,10 @@ You can easily convert v1 into v2 by just using this sample code.
 #### 1-7. get `API Endpoint` and `API Key` after all events are completed
 
 ##### API Endpoint
-<img src="https://user-images.githubusercontent.com/61146815/75364199-a5833b80-58fe-11ea-871c-1c741ead3c60.png" width="500px">
+<img src="https://user-images.githubusercontent.com/61146815/75626288-ad4a2500-5c09-11ea-89b5-a510ac03bbec.png" width="500px">
 
 ##### API Key
-<span><img src="https://user-images.githubusercontent.com/61146815/75365773-01e75a80-5901-11ea-867a-0d8bb7d57bf5.png" width="500px"><img src="https://user-images.githubusercontent.com/61146815/75364465-204c5680-58ff-11ea-983a-d1b2871d9e79.png" width="200px">
+<span><img src="https://user-images.githubusercontent.com/61146815/75626305-d10d6b00-5c09-11ea-810f-182a4e403729.png" width="500px"><img src="https://user-images.githubusercontent.com/61146815/75364465-204c5680-58ff-11ea-983a-d1b2871d9e79.png" width="200px">
 </span>
 
 #### 1-8. test the connection by using `API Endpoint` and `API Key`
