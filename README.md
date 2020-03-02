@@ -16,7 +16,7 @@ You can easily convert v1 into v2 by just using this sample code.
 
 [3. Migrate from Sandbox to Production](#3-migrate-from-sandbox-to-production)
 
-[4.Tips](#4-tip)
+[4. Tips](#4-tip)
 
 <br/>
 
