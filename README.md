@@ -127,7 +127,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --head
 
 <br/>
 
-### 2-3. Download [amazonpayV2Converter.js](https://XXX/amazonpayV2Converter.js) Add the script tags on your EC site
+### 2-3. Download [amazonpayV2Converter.js](https://github.com/amazonpay-labs/amazonpay-v2-converter/blob/master/amazonpayV2Converter.js) Add the script tags on your EC site
 #### Add the script tags on the Cart Page with Amazon Pay Button
 
 ```
