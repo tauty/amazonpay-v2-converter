@@ -214,20 +214,21 @@ amazonpayV2Converter.sandbox().showAddress(getCheckoutSessionURL, {
 <br/>
 
 ## 3. Migrate from Sandbox to Production
-* Lambda環境変数をsandbox true -> false　へ変更
-* checkoutReviewReturnUrl　を本番URLへ変更
-* （おすすめ）API GatewayのリソースポリシーにIPアドレスを設定する方法をまとめる
-https://aws.amazon.com/jp/premiumsupport/knowledge-center/api-gateway-resource-policy-whitelist/
+* change Lambda environment variable(sandbox) true -> false
+* change checkoutReviewReturnUrl to production URL
+* (recommend)[use a resource policy to whitelist certain IP addresses to access your API Gateway API](https://aws.amazon.com/jp/premiumsupport/knowledge-center/api-gateway-resource-policy-whitelist/)
 
 <br/>
 
 ## 4. Tips
-### 4-1. 本番と開発環境を分けたい場合の利用方法
-* 新たにcloudformationを使って、開発環境用のAPIを構築する
+### 4-1. How to build production and testing environment
+* click `deploy to AWS` button again and create another environment.
 
-### 4-2. エラーが発生した場合の調査方法
-* Forbbdenの場合
-* cloudwatchを見る方法
+### 4-2. Inquire into the cause of errors
+revising...
+
+* Forbbden
+* how to check cloudwatch
 
 <br/>
 
