@@ -32,10 +32,10 @@ You can easily convert v1 into v2 by just using this sample code.
 #### prepare required parameters
 
 |parameters|how to prepare|
-|---|:---:|
+|---|---|
 |STORE_ID|SellerCentral > Amazon Login > Web settings > clientId|
 |PRIVATE_KEY, PUBLIC_KEY_ID|[Generate public and private key pair, Get your publicKeyId](https://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-checkout/get-set-up-for-integration.html#4-get-your-publickeyid)|
-|CHECKOUT_REVIEW_RETURN_URL|Use the checkoutReviewReturnUrl parameter to specify the URL which the buyer is redirected to, after they select their preferred shipping address and payment method.|
+|CHECKOUT_REVIEW_RETURN_URL|Use the checkoutReviewReturnUrl parameter to specify the URL which the buyer is redirected to, after they select their preferred shipping address and payment method.<br> [Ref: Create an Amazon Pay checkout session](https://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-checkout/add-the-amazon-pay-button.html#1-create-an-amazon-pay-checkout-session)|
 
 #### click this button and open CloudFormation on your AWS
 
