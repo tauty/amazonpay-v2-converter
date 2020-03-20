@@ -1,113 +1,122 @@
 /** override v1 OffAmazonPayments */
 var OffAmazonPayments = (function () {
-  // button
-  var amznBtnId;
-  var merchantId;
-  var returnURL;
-  amazon.Login = (function () {
-    var returnURL;
+    // button
+    var amznBtnId;
+    var merchantId;
+    amazon.Login = (function () {
+      var returnURL;
+      return {
+        authorize: function (loginOptions, url) {
+          returnURL = url;
+        },
+        getReturnURL: function () {
+          return returnURL;
+        },
+      };
+    }) ();
+    // widgets
+    var walletElmId;
+    var addressBookElmId;
     return {
-      authorize: function (loginOptions, url) {
-        this.returnURL = url;
+      Button: function (id, mid, obj) {
+        amznBtnId = id;
+        merchantId = mid;
+        obj.authorization ();
       },
-      getReturnURL: function () {
-        return this.returnURL;
+      getBtnElmId: function () {
+        return amznBtnId;
+      },
+      getMerchantId: function () {
+        return merchantId;
+      },
+      Widgets: {
+        Wallet: function (obj) {
+          return {
+            bind: function (id) {
+              OffAmazonPayments.Widgets.setWalletElmId (id);
+            },
+            getElmId: function () {
+              return walletElmId;
+            },
+          };
+        },
+        setWalletElmId: function (id) {
+          walletElmId = id;
+        },
+        getWalletElmId: function () {
+          return walletElmId;
+        },
+        AddressBook: function (obj) {
+          return {
+            bind: function (id) {
+              OffAmazonPayments.Widgets.setAddressElmId (id);
+              this.executeReady ();
+            },
+            getElmId: function () {
+              return addressBookElmId;
+            },
+            executeReady: function () {
+              obj.onReady ({
+                getAmazonOrderReferenceId: function () {},
+              });
+            },
+          };
+        },
+        setAddressElmId: function (id) {
+          addressBookElmId = id;
+        },
+        getAddressElmId: function () {
+          return addressBookElmId;
+        },
       },
     };
   }) ();
-  // widgets
-  var walletElmId;
-  var addressBookElmId;
-  return {
-    Button: function (id, mid, obj) {
-      this.amznBtnId = id;
-      this.merchantId = mid;
-      obj.authorization ();
-    },
-    getBtnElmId: function () {
-      return '#' + this.amznBtnId;
-    },
-    getMerchantId: function () {
-      return this.merchantId;
-    },
-    Widgets: {
-      Wallet: function (obj) {
-        return {
-          bind: function (id) {
-            OffAmazonPayments.Widgets.setWalletElmId (id);
-          },
-          getElmId: function () {
-            return this.walletElmId;
-          },
-        };
-      },
-      setWalletElmId: function (id) {
-        this.walletElmId = id;
-      },
-      getWalletElmId: function () {
-        return this.walletElmId;
-      },
-      AddressBook: function (obj) {
-        return {
-          bind: function (id) {
-            OffAmazonPayments.Widgets.setAddressElmId (id);
-            this.executeReady ();
-          },
-          getElmId: function () {
-            return this.addressBookElmId;
-          },
-          executeReady: function () {
-            obj.onReady ({
-              getAmazonOrderReferenceId: function () {},
-            });
-          },
-        };
-      },
-      setAddressElmId: function (id) {
-        this.addressBookElmId = id;
-      },
-      getAddressElmId: function () {
-        return this.addressBookElmId;
-      },
-    },
-  };
-}) ();
+  
+  /** v1->v2 converter */
+var amazonpayV2Converter = ( function () {
 
-/** v1->v2 converter */
-var amazonpayV2Converter = (function () {
-  // It is possible to use Object.assign on IE to use this function.
-  if (!Object.assign) {
-    Object.defineProperty (Object, 'assign', {
-      enumerable: false,
-      configurable: true,
-      writable: true,
-      value: function (target) {
-        if (target === undefined || target === null) {
-          throw new TypeError ('Cannot convert first argument to object');
-        }
-        var to = Object (target);
-        for (var i = 1; i < arguments.length; i++) {
-          var nextSource = arguments[i];
-          if (nextSource === undefined || nextSource === null) {
-            continue;
+  if (window.onAmazonPaymentsReady) {
+    onAmazonPaymentsReady();
+  }
+
+  setObjectAssign();
+  setLoadingIconStyle();
+
+  // This allows IE to use Object.assign method.
+  function setObjectAssign () {
+    if (!Object.assign) {
+      Object.defineProperty (Object, 'assign', {
+        enumerable: false,
+        configurable: true,
+        writable: true,
+        value: function (target) {
+          if (target === undefined || target === null) {
+            throw new TypeError ('Cannot convert first argument to object');
           }
-          nextSource = Object (nextSource);
-          var keysArray = Object.keys (Object (nextSource));
-          for (
-            var nextIndex = 0, len = keysArray.length;
-            nextIndex < len;
-            nextIndex++
-          ) {
-            var nextKey = keysArray[nextIndex];
-            var desc = Object.getOwnPropertyDescriptor (nextSource, nextKey);
-            if (desc !== undefined && desc.enumerable) {
-              to[nextKey] = nextSource[nextKey];
+          var to = Object (target);
+          for (var i = 1; i < arguments.length; i++) {
+            var nextSource = arguments[i];
+            if (nextSource === undefined || nextSource === null) {
+              continue;
+            }
+            nextSource = Object (nextSource);
+            var keysArray = Object.keys (Object (nextSource));
+            for (
+              var nextIndex = 0, len = keysArray.length;
+              nextIndex < len;
+              nextIndex++
+            ) {
+              var nextKey = keysArray[nextIndex];
+              var desc = Object.getOwnPropertyDescriptor (nextSource, nextKey);
+              if (desc !== undefined && desc.enumerable) {
+                to[nextKey] = nextSource[nextKey];
+              }
             }
           }
-        }
-        return to;
-      },
-    });
+          return to;
+        },
+      });
+    } 
   }
 
   // generate node
@@ -121,9 +130,9 @@ var amazonpayV2Converter = (function () {
       Object.assign (element.style, styleJson);
       return element;
     };
-    element.attrs = function (attrJson) {
-      for (var attr in attrJson) {
-        var value = attrJson[attr];
+    element.attrs = function (attrObj) {
+      for (var attr in attrObj) {
+        var value = attrObj[attr];
         if (/^on[A-Z]/.test (attr)) {
           var eventName = attr.slice (2).toLocaleLowerCase ();
           element.addEventListener (eventName, value);
@@ -154,49 +163,62 @@ var amazonpayV2Converter = (function () {
 
   // post request
   var post = (function () {
-    var url;
-    var request;
-    var success;
-    var error;
+    var _url;
+    var _request;
+    var _output;
     return {
       url: function (url) {
-        this.url = url;
+        _url = url;
         return this;
       },
       request: function (obj) {
-        this.request = obj;
+        _request = obj;
         return this;
       },
-      success: function (func) {
-        this.success = func;
-        return this;
-      },
-      error: function (func) {
-        this.error = func;
+      output: function (func) {
+        _output = func;
         return this;
       },
       exec: function () {
-        if (!this.url) throw new Error ('Please set url(url)');
-        if (!this.success) throw new Error ('Please set success(obj)');
+        if ( !( _url && _output && _request ) ) {
+          alert( 'invalid post pamrameter.' );
+          _output();
+          return;
+        }
+        
         var xhr = new XMLHttpRequest ();
-        xhr.open ('POST', this.url);
-        xhr.setRequestHeader ('Content-Type', 'application/json');
+        xhr.open( 'POST', _url );
+        xhr.setRequestHeader( 'Content-Type', 'application/json' );
         xhr.onload = () => {
-          var response = JSON.parse (xhr.response);
-          this.success (response);
-          //TODO need to check response.status
+          try {
+            if (xhr.status === 200) {
+              var response = JSON.parse( xhr.response );
+              _output( response );
+            } else {
+              throw new Error(xhr);
+            }
+          } catch ( e ) {
+            if ( e ) console.error( e );
+            _output();
+          }
         };
         xhr.onerror = () => {
-          if (this.error) error ();
+          _output();
         };
-        if (this.request) xhr.send (this.request);
+        xhr.send( _request );
       },
     };
   }) ();
 
-  // generate Amazon Pay v2 function
-  var amazonPayV2 = function (sandbox) {
-    var widgetsStyle = {
+  // add stylesheet for loading icon
+  function setLoadingIconStyle () {
+    var styleSheet = document.styleSheets[0];
+    var keyframes = '@keyframes loaderAnime {0% {transform: rotate(0deg);-ms-transform: rotate(0deg);-webkit-transform: rotate(0deg);-moz-transform: rotate(0deg);}100% {transform: rotate(360deg);-ms-transform: rotate(360deg);-webkit-transform: rotate(360deg);-moz-transform: rotate(360deg);}}';
+    styleSheet.insertRule( keyframes, styleSheet.cssRules.length );    
+  }
+
+  function getWidgetsStyle (styleObj) {
+    return styleObj || {
       border: '1px solid #bbb',
       borderRadius: '6px',
       display: 'flex',
@@ -204,143 +226,180 @@ var amazonpayV2Converter = (function () {
       alignItems: 'center',
       padding: '0 10px 0 10px',
     };
-
-    return {
-      renderButton (createCheckoutSessionURL) {
-        var renderConf = {
-          merchantId: OffAmazonPayments.getMerchantId (),
-          createCheckoutSession: {
-            url: createCheckoutSessionURL,
-            method: 'GET',
-          },
-          ledgerCurrency: 'JPY',
-          checkoutLanguage: 'ja_JP',
-          productType: 'PayAndShip',
-          placement: 'Cart',
-        };
-        if (sandbox) renderConf.sandbox = true;
-
-        amazon.Pay.renderButton (OffAmazonPayments.getBtnElmId (), renderConf);
-      },
-      renderAddress (url, checkoutSessionId, postJson) {
-        try {
-          if (typeof postJson === undefined) postJson = {};
-
-          var postParam = JSON.stringify (postJson);
-          post
-            .url (url)
-            .request (postParam)
-            .success (function (obj) {
-              // TODO if(!obj){}  
-              var addressElm = document.getElementById (
-                OffAmazonPayments.Widgets.getAddressElmId ()
-              );
-              var postalCode = obj.shippingAddress.postalCode;
-              var address =
-                obj.shippingAddress.stateOrRegion +
-                obj.shippingAddress.addressLine1;
-              if (obj.shippingAddress.addressLine2)
-                address += obj.shippingAddress.addressLine2;
-              if (obj.shippingAddress.addressLine3)
-                address += obj.shippingAddress.addressLine3;
-              var widgets = createNode ('div').parts (
-                createNode ('div').text (obj.shippingAddress.name).styles ({
-                  fontWeight: 'bold',
-                }),
-                createNode ('div').text (postalCode),
-                createNode ('div').text (address)
-              );
-                
-              var updateButton = createNode ('button')
-                .styles ({
-                  display: 'block',
-                  position: 'relative',
-                  fontSize: '1rem',
-                  padding: '.375rem .75rem',
-                  textAlign: 'center',
-                  lineHeight: '1.5',
-                  borderRadius: '.25rem',
-                  color: '#fff',
-                  background: '#6c757d',
-                })
-                .attrs ({
-                  id: 'updateCheckoutDetails',
-                })
-                .text ('変更');
-
-              createNode (addressElm)
-                .styles (widgetsStyle)
-                .parts (widgets, updateButton);
-
-              amazon.Pay.bindChangeAction ('#updateCheckoutDetails', {
-                amazonCheckoutSessionId: checkoutSessionId,
-                changeAction: 'changeAddress',
-              });
-            })
-            .exec ();
-        } catch (e) {}
-      },
-      renderPayment () {
-        var walletElm = document.getElementById (
-          OffAmazonPayments.Widgets.getWalletElmId ()
-        );
-        createNode (walletElm).styles (widgetsStyle).parts (
-          createNode ('div').text ('Amazon Pay').styles ({
-            fontWeight: 'bold',
-          })
-        );
-      },
-    };
-  };
-
-  if (window.onAmazonPaymentsReady) {
-    onAmazonPaymentsReady ();
   }
 
-  var sandbox = false;
-  var checkoutSessionId;
+  function renderButton ( createCheckoutSessionURL, buttonParams ) {
+    buttonParams = buttonParams || {};
+
+    var renderConf = {
+      merchantId: OffAmazonPayments.getMerchantId (),
+      createCheckoutSession: {
+        url: createCheckoutSessionURL
+      },
+      ledgerCurrency: buttonParams.ledgerCurrency || 'JPY',
+      checkoutLanguage: buttonParams.checkoutLanguage || 'ja_JP',
+      productType: buttonParams.productType || 'PayAndShip',
+      placement: buttonParams.placement || 'Cart'
+    };
+
+    renderConf.sandbox = buttonParams.sandbox ? true : false;
+    amazon.Pay.renderButton ('#' + OffAmazonPayments.getBtnElmId (), renderConf);
+    
+    // add loading div
+    var payButton = document.getElementById( OffAmazonPayments.getBtnElmId() );
+    payButton.addEventListener( 'click', function () {
+      var loadingElm = createNode( 'div' ).styles({
+          width: '1.5em',
+          height: '1.5em',
+          borderTop: '0.3em solid rgba(140, 139, 139, 0.5)',
+          borderRight: '0.3em solid rgba(140, 139, 139, 0.5)',
+          borderBottom: '0.3em solid rgba(140, 139, 139, 0.5)',
+          borderLeft: '0.3em solid rgba(255, 255, 255, 0.1)',
+          animation: 'loaderAnime 1s infinite linear',
+          borderRadius: '50%',
+          position: 'absolute',
+          top: '1em',
+          right: '0',
+          bottom: '0',
+          left: '0',
+          margin: 'auto',
+          zIndex: '10000'
+      });
+      payButton.insertAdjacentElement( 'afterend', loadingElm );
+      createNode( payButton ).styles( {
+        pointerEvents: 'none',
+        opacity: '0.4'
+      });
+    });
+  }
+
+  function renderAddress ( url, checkoutSessionId, postJson, widgetsStyle, updateButtonStyle ) {
+    try {
+      postJson = postJson || {};
+
+      var addressElm = document.getElementById (
+        OffAmazonPayments.Widgets.getAddressElmId ()
+      );
+
+      var loadingElm = createNode( 'div' ).styles( {
+        width: '3em',
+        height: '3em',
+        borderTop: '0.3em solid rgba(140, 139, 139, 0.5)',
+        borderRight: '0.3em solid rgba(140, 139, 139, 0.5)',
+        borderBottom: '0.3em solid rgba(140, 139, 139, 0.5)',
+        borderLeft: '0.3em solid #f3f3f3',
+        animation: 'loaderAnime 1s infinite linear',
+        borderRadius: '50%',
+        position: 'relative',
+        margin: 'auto',
+        zIndex: '10000'
+      });
+
+      var addressNode = createNode( addressElm ).styles( getWidgetsStyle(widgetsStyle) ).parts( loadingElm ); // set loading icon
+
+      var postParam = JSON.stringify (postJson);
+      post
+        .url (url)
+        .request (postParam)
+        .output( function ( response ) {
+          var setErrorMessage = function ( message, addressNode ) {
+            addressNode.parts( createNode( 'div' ).text( message ) ).styles( {
+              color: '#ff0000'
+            });
+          };
+
+          var setAddress = function ( shippingAddress, addressNode ) {
+            var postalCode = shippingAddress.postalCode;
+            var address = shippingAddress.stateOrRegion + shippingAddress.addressLine1;
+              address += shippingAddress.addressLine2 || '';
+              address += shippingAddress.addressLine3 || '';
+            var widgets = createNode( 'div' ).parts(
+              createNode( 'div' ).text( shippingAddress.name ).styles( {
+                fontWeight: 'bold',
+              } ),
+              createNode( 'div' ).text( postalCode ),
+              createNode( 'div' ).text( address )
+            );
+
+            updateButtonStyle = updateButtonStyle || {
+              display: 'block',
+              position: 'relative',
+              fontSize: '1rem',
+              padding: '.375rem .75rem',
+              textAlign: 'center',
+              lineHeight: '1.5',
+              borderRadius: '.25rem',
+              color: '#fff',
+              background: '#6c757d',
+            }
+              
+            var updateButton = createNode( 'button' )
+              .styles( updateButtonStyle )
+              .attrs( {
+                id: 'updateCheckoutDetails',
+              } )
+              .text( '変更' );//TODO translate this error message
+            addressNode.parts( widgets, updateButton );
+
+            amazon.Pay.bindChangeAction( '#updateCheckoutDetails', {
+              amazonCheckoutSessionId: checkoutSessionId,
+              changeAction: 'changeAddress',
+            } );
+          };
+
+          addressNode.removeChild(addressNode.firstChild); // remove loading icon
+          if ( response && response.shippingAddress ) {
+            setAddress( response.shippingAddress, addressNode );
+          } else {
+            setErrorMessage( '住所情報を取得できません。他のお支払い方法をお選びください。', addressNode ); //TODO translate this error message
+          }
+        })
+        .exec ();
+    } catch ( e ) {
+      console.error(e);
+    }
+  }
+  
+  function renderPayment (widgetsStyle) {
+    var walletElm = document.getElementById (
+      OffAmazonPayments.Widgets.getWalletElmId ()
+    );
+    createNode( walletElm ).styles( getWidgetsStyle( widgetsStyle ) ).parts(
+      createNode ('div').text ('Amazon Pay').styles ({
+        fontWeight: 'bold',
+      })
+    );
+  }  
   return {
-    sandbox: function () {
-      sandbox = true;
-      return this;
-    },
-    showButton: function (createCheckoutSessionURL, error) {
-      try {
-        amazonPayV2 (sandbox).renderButton (createCheckoutSessionURL);
-      } catch (e) {
-        // TODO if renderButton fails
-        if (error) error (e);
-      }
+    showButton: function (createCheckoutSessionURL, buttonParams) {
+      renderButton (createCheckoutSessionURL, buttonParams);
     },
     getReturnURL: function () {
       var returnURL = amazon.Login.getReturnURL ();
       return returnURL.match (/http/)
         ? returnURL
         : window.location.origin + '/' + returnURL;
-      //TODO ./xxx.html
     },
-    getCheckoutSessionId: function () {
-      function getURLParameter (name) {
-        return (
-          decodeURIComponent (
-            (new RegExp (
-              '[?|&amp;|#]' + name + '=' + '([^&;]+?)(&|#|;|$)'
-            ).exec (location.search) || [, ''])[1]
-              .replace (/\+/g, '%20')
+    getCheckoutSessionId: (function() {
+      var amazonCheckoutSessionId = null;
+      return function () {
+        return amazonCheckoutSessionId || (
+          decodeURIComponent(
+            ( new RegExp(
+              '[?|&amp;|#]amazonCheckoutSessionId=' + '([^&;]+?)(&|#|;|$)'
+            ).exec( location.search ) || [, ''] )[1]
+              .replace( /\+/g, '%20' )
           ) || null
-        );
+        )
       }
-
-      checkoutSessionId = getURLParameter ('amazonCheckoutSessionId');
-      return checkoutSessionId;
-    },
-    showAddress: function (url, postJson) {
-      amazonPayV2 ().renderAddress (url, checkoutSessionId, postJson);
+    }) (),
+    showAddress: function (url, postJson, widgetsStyle, updateButtonStyle) {
+      renderAddress (url, this.getCheckoutSessionId(), postJson, widgetsStyle, updateButtonStyle);
       return this;
     },
-    showPayment: function () {
-      amazonPayV2 ().renderPayment ();
+    showPayment: function (widgetsStyle) {
+      renderPayment( widgetsStyle );
       return this;
-    },
+    }
   };
-}) ();
+} )();
