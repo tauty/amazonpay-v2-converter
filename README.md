@@ -74,7 +74,7 @@ You can easily convert v1 into v2 by just using this sample code.
 curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --header 'x-api-key:${API Key}' ${API Endpoint}
 
 ex.
-curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --header 'x-api-key:XXXXXXXXXXXXXXXXXXXXXXXXXX' https://XXXXXXXXX.execute-api.ap-northeast-1.amazonaws.com/Prod/
+curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --header 'x-api-key:XXXXXXXXXXXXXXXXXXXXXXXXXX' https://XXXXXXXXX.execute-api.ap-northeast-1.amazonaws.com/AmazonPay/
 ```
 
 <br/>
@@ -91,7 +91,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --head
 ```
 <?php
 
-    $result = execute('https://XXXXXXXXX.execute-api.ap-northeast-1.amazonaws.com/Prod', array("action" => "create"));
+    $result = execute('https://XXXXXXXXX.execute-api.ap-northeast-1.amazonaws.com/AmazonPay', array("action" => "CreateCheckoutSession"));
     echo $result;
 
 
@@ -122,6 +122,24 @@ curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --head
         curl_close($curl);
 
         return json_encode($result);
+    }
+```
+
+<p>ex. execute Get Checkout Session API</p>
+
+
+```
+<?php
+    $requestJson = file_get_contents('php://input');
+    $request = json_decode($requestJson);
+    $request->action = 'GetCheckoutSession';
+
+    $result = execute('https://XXXXXXXXX.execute-api.ap-northeast-1.amazonaws.com/AmazonPay', $request);
+    echo $result;
+
+
+    function execute($url, $requestJson) {
+      ...
     }
 ```
 
