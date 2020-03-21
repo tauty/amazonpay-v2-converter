@@ -81,7 +81,39 @@ var amazonpayV2Converter = ( function () {
 
   setObjectAssign();
   setLoadingIconStyle();
-
+  
+  return {
+    showButton: function ( createCheckoutSessionURL, buttonParams ) {
+      payButton( createCheckoutSessionURL ).parameters( buttonParams );
+    },
+    getReturnURL: function () {
+      var returnURL = amazon.Login.getReturnURL ();
+      return returnURL.match (/http/)
+        ? returnURL
+        : window.location.origin + '/' + returnURL;
+    },
+    getCheckoutSessionId: (function() {
+      var amazonCheckoutSessionId = null;
+      return function () {
+        return amazonCheckoutSessionId || (
+          decodeURIComponent(
+            ( new RegExp(
+              '[?|&amp;|#]amazonCheckoutSessionId=' + '([^&;]+?)(&|#|;|$)'
+            ).exec( location.search ) || [, ''] )[1]
+              .replace( /\+/g, '%20' )
+          ) || null
+        )
+      }
+    }) (),
+    showAddress: function ( url, postJson, widgetsStyle, updateButtonStyle ) {
+      payWidgets( widgetsStyle ).address( updateButtonStyle ).show( url, this.getCheckoutSessionId(), postJson );
+      return this;
+    },
+    showPayment: function ( widgetsStyle ) {
+      payWidgets( widgetsStyle ).payment().show();
+      return this;
+    }
+  };
   // This allows IE to use Object.assign method.
   function setObjectAssign () {
     if (!Object.assign) {
@@ -161,8 +193,15 @@ var amazonpayV2Converter = ( function () {
     return element;
   }
 
+  // add stylesheet for loading icon
+  function setLoadingIconStyle () {
+    var styleSheet = document.styleSheets[0];
+    var keyframes = '@keyframes loaderAnime {0% {transform: rotate(0deg);-ms-transform: rotate(0deg);-webkit-transform: rotate(0deg);-moz-transform: rotate(0deg);}100% {transform: rotate(360deg);-ms-transform: rotate(360deg);-webkit-transform: rotate(360deg);-moz-transform: rotate(360deg);}}';
+    styleSheet.insertRule( keyframes, styleSheet.cssRules.length );    
+  }
+
   // post request
-  var post = (function () {
+  function post() {
     var _url;
     var _request;
     var _output;
@@ -208,16 +247,10 @@ var amazonpayV2Converter = ( function () {
         xhr.send( _request );
       },
     };
-  }) ();
-
-  // add stylesheet for loading icon
-  function setLoadingIconStyle () {
-    var styleSheet = document.styleSheets[0];
-    var keyframes = '@keyframes loaderAnime {0% {transform: rotate(0deg);-ms-transform: rotate(0deg);-webkit-transform: rotate(0deg);-moz-transform: rotate(0deg);}100% {transform: rotate(360deg);-ms-transform: rotate(360deg);-webkit-transform: rotate(360deg);-moz-transform: rotate(360deg);}}';
-    styleSheet.insertRule( keyframes, styleSheet.cssRules.length );    
   }
 
-  var payButton = function ( createCheckoutSessionURL ) {
+  // show Amazon Pay buttion
+  function payButton ( createCheckoutSessionURL ) {
     // add loading div
     var payButton = document.getElementById( OffAmazonPayments.getBtnElmId() );
     payButton.addEventListener( 'click', function () {
@@ -266,7 +299,8 @@ var amazonpayV2Converter = ( function () {
     }
   }
 
-  var payWidgets = function ( widgetsStyle ) {
+  // show Amazon Pay Widgets
+  function payWidgets ( widgetsStyle ) {
     return {
       address: function ( updateButtonStyle ) {
 
@@ -296,7 +330,7 @@ var amazonpayV2Converter = ( function () {
             postJson = postJson || {};
             try {
               var postParam = JSON.stringify (postJson);
-              post
+              post()
                 .url (url)
                 .request (postParam)
                 .output( function ( response ) {
@@ -389,37 +423,4 @@ var amazonpayV2Converter = ( function () {
       };
     }
   }
-  
-  return {
-    showButton: function ( createCheckoutSessionURL, buttonParams ) {
-      payButton( createCheckoutSessionURL ).parameters( buttonParams );
-    },
-    getReturnURL: function () {
-      var returnURL = amazon.Login.getReturnURL ();
-      return returnURL.match (/http/)
-        ? returnURL
-        : window.location.origin + '/' + returnURL;
-    },
-    getCheckoutSessionId: (function() {
-      var amazonCheckoutSessionId = null;
-      return function () {
-        return amazonCheckoutSessionId || (
-          decodeURIComponent(
-            ( new RegExp(
-              '[?|&amp;|#]amazonCheckoutSessionId=' + '([^&;]+?)(&|#|;|$)'
-            ).exec( location.search ) || [, ''] )[1]
-              .replace( /\+/g, '%20' )
-          ) || null
-        )
-      }
-    }) (),
-    showAddress: function ( url, postJson, widgetsStyle, updateButtonStyle ) {
-      payWidgets( widgetsStyle ).address( updateButtonStyle ).show( url, this.getCheckoutSessionId(), postJson );
-      return this;
-    },
-    showPayment: function ( widgetsStyle ) {
-      payWidgets( widgetsStyle ).payment().show();
-      return this;
-    }
-  };
 } )();
