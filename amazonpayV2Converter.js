@@ -217,34 +217,7 @@ var amazonpayV2Converter = ( function () {
     styleSheet.insertRule( keyframes, styleSheet.cssRules.length );    
   }
 
-  function getWidgetsStyle (styleObj) {
-    return styleObj || {
-      border: '1px solid #bbb',
-      borderRadius: '6px',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '0 10px 0 10px',
-    };
-  }
-
-  function renderButton ( createCheckoutSessionURL, buttonParams ) {
-    buttonParams = buttonParams || {};
-
-    var renderConf = {
-      merchantId: OffAmazonPayments.getMerchantId (),
-      createCheckoutSession: {
-        url: createCheckoutSessionURL
-      },
-      ledgerCurrency: buttonParams.ledgerCurrency || 'JPY',
-      checkoutLanguage: buttonParams.checkoutLanguage || 'ja_JP',
-      productType: buttonParams.productType || 'PayAndShip',
-      placement: buttonParams.placement || 'Cart'
-    };
-
-    renderConf.sandbox = buttonParams.sandbox ? true : false;
-    amazon.Pay.renderButton ('#' + OffAmazonPayments.getBtnElmId (), renderConf);
-    
+  var payButton = function ( createCheckoutSessionURL ) {
     // add loading div
     var payButton = document.getElementById( OffAmazonPayments.getBtnElmId() );
     payButton.addEventListener( 'click', function () {
@@ -271,108 +244,155 @@ var amazonpayV2Converter = ( function () {
         opacity: '0.4'
       });
     });
+
+    return {
+      parameters: function ( buttonParams ) {
+        buttonParams = buttonParams || {};
+
+        var renderConf = {
+          merchantId: OffAmazonPayments.getMerchantId (),
+          createCheckoutSession: {
+            url: createCheckoutSessionURL
+          },
+          ledgerCurrency: buttonParams.ledgerCurrency || 'JPY',
+          checkoutLanguage: buttonParams.checkoutLanguage || 'ja_JP',
+          productType: buttonParams.productType || 'PayAndShip',
+          placement: buttonParams.placement || 'Cart'
+        };
+    
+        renderConf.sandbox = buttonParams.sandbox ? true : false;
+        amazon.Pay.renderButton ('#' + OffAmazonPayments.getBtnElmId (), renderConf);   
+      }
+    }
   }
 
-  function renderAddress ( url, checkoutSessionId, postJson, widgetsStyle, updateButtonStyle ) {
-    try {
-      postJson = postJson || {};
+  var payWidgets = function ( widgetsStyle ) {
+    return {
+      address: function ( updateButtonStyle ) {
 
-      var addressElm = document.getElementById (
-        OffAmazonPayments.Widgets.getAddressElmId ()
-      );
-
-      var loadingElm = createNode( 'div' ).styles( {
-        width: '3em',
-        height: '3em',
-        borderTop: '0.3em solid rgba(140, 139, 139, 0.5)',
-        borderRight: '0.3em solid rgba(140, 139, 139, 0.5)',
-        borderBottom: '0.3em solid rgba(140, 139, 139, 0.5)',
-        borderLeft: '0.3em solid #f3f3f3',
-        animation: 'loaderAnime 1s infinite linear',
-        borderRadius: '50%',
-        position: 'relative',
-        margin: 'auto',
-        zIndex: '10000'
-      });
-
-      var addressNode = createNode( addressElm ).styles( getWidgetsStyle(widgetsStyle) ).parts( loadingElm ); // set loading icon
-
-      var postParam = JSON.stringify (postJson);
-      post
-        .url (url)
-        .request (postParam)
-        .output( function ( response ) {
-          var setErrorMessage = function ( message, addressNode ) {
-            addressNode.parts( createNode( 'div' ).text( message ) ).styles( {
-              color: '#ff0000'
-            });
-          };
-
-          var setAddress = function ( shippingAddress, addressNode ) {
-            var postalCode = shippingAddress.postalCode;
-            var address = shippingAddress.stateOrRegion + shippingAddress.addressLine1;
-              address += shippingAddress.addressLine2 || '';
-              address += shippingAddress.addressLine3 || '';
-            var widgets = createNode( 'div' ).parts(
-              createNode( 'div' ).text( shippingAddress.name ).styles( {
-                fontWeight: 'bold',
-              } ),
-              createNode( 'div' ).text( postalCode ),
-              createNode( 'div' ).text( address )
-            );
-
-            updateButtonStyle = updateButtonStyle || {
-              display: 'block',
-              position: 'relative',
-              fontSize: '1rem',
-              padding: '.375rem .75rem',
-              textAlign: 'center',
-              lineHeight: '1.5',
-              borderRadius: '.25rem',
-              color: '#fff',
-              background: '#6c757d',
+        var addressElm = document.getElementById (
+          OffAmazonPayments.Widgets.getAddressElmId ()
+        );
+  
+        var loadingElm = createNode( 'div' ).styles( {
+          width: '3em',
+          height: '3em',
+          borderTop: '0.3em solid rgba(140, 139, 139, 0.5)',
+          borderRight: '0.3em solid rgba(140, 139, 139, 0.5)',
+          borderBottom: '0.3em solid rgba(140, 139, 139, 0.5)',
+          borderLeft: '0.3em solid #f3f3f3',
+          animation: 'loaderAnime 1s infinite linear',
+          borderRadius: '50%',
+          position: 'relative',
+          margin: 'auto',
+          zIndex: '10000'
+        });
+        var addressNode = createNode( addressElm )
+          .styles( getWidgetsStyle( widgetsStyle ) )
+          .parts( loadingElm ); // set loading icon  
+                
+        return {
+          show: function (url, checkoutSessionId, postJson) {
+            postJson = postJson || {};
+            try {
+              var postParam = JSON.stringify (postJson);
+              post
+                .url (url)
+                .request (postParam)
+                .output( function ( response ) {
+                  addressNode.removeChild(addressNode.firstChild); // remove loading icon
+                  if ( response && response.shippingAddress ) {
+                    setAddress( checkoutSessionId, response.shippingAddress, addressNode );
+                  } else {
+                    setErrorMessage( '住所情報を取得できません。他のお支払い方法をお選びください。', addressNode ); //TODO translate this error message
+                  }
+                })
+                .exec ();
+            } catch ( e ) {
+              console.error(e);
             }
-              
-            var updateButton = createNode( 'button' )
-              .styles( updateButtonStyle )
-              .attrs( {
-                id: 'updateCheckoutDetails',
-              } )
-              .text( '変更' );//TODO translate this error message
-            addressNode.parts( widgets, updateButton );
-
-            amazon.Pay.bindChangeAction( '#updateCheckoutDetails', {
-              amazonCheckoutSessionId: checkoutSessionId,
-              changeAction: 'changeAddress',
-            } );
-          };
-
-          addressNode.removeChild(addressNode.firstChild); // remove loading icon
-          if ( response && response.shippingAddress ) {
-            setAddress( response.shippingAddress, addressNode );
-          } else {
-            setErrorMessage( '住所情報を取得できません。他のお支払い方法をお選びください。', addressNode ); //TODO translate this error message
           }
-        })
-        .exec ();
-    } catch ( e ) {
-      console.error(e);
+        }
+
+        function getUpdateButtion () {
+          updateButtonStyle = updateButtonStyle || {
+            display: 'block',
+            position: 'relative',
+            fontSize: '1rem',
+            padding: '.375rem .75rem',
+            textAlign: 'center',
+            lineHeight: '1.5',
+            borderRadius: '.25rem',
+            color: '#fff',
+            background: '#6c757d',
+          }
+            
+          return createNode( 'button' )
+            .styles( updateButtonStyle )
+            .attrs( {
+              id: 'updateCheckoutDetails',
+            } )
+            .text( '変更' );//TODO translate this error message
+        }
+
+        function setErrorMessage ( message, addressNode ) {
+          addressNode.parts( createNode( 'div' ).text( message ) ).styles( {
+            color: '#ff0000'
+          });
+        };
+
+        function setAddress ( checkoutSessionId, shippingAddress, addressNode ) {
+          var postalCode = shippingAddress.postalCode;
+          var address = shippingAddress.stateOrRegion + shippingAddress.addressLine1;
+            address += shippingAddress.addressLine2 || '';
+            address += shippingAddress.addressLine3 || '';
+          var widgets = createNode( 'div' ).parts(
+            createNode( 'div' ).text( shippingAddress.name ).styles( {
+              fontWeight: 'bold',
+            } ),
+            createNode( 'div' ).text( postalCode ),
+            createNode( 'div' ).text( address )
+          );
+          addressNode.parts( widgets, getUpdateButtion( updateButtonStyle ) );
+
+          amazon.Pay.bindChangeAction( '#updateCheckoutDetails', {
+            amazonCheckoutSessionId: checkoutSessionId,
+            changeAction: 'changeAddress',
+          } );
+        };
+      },
+      payment: function () {
+        var walletElm = document.getElementById (
+          OffAmazonPayments.Widgets.getWalletElmId ()
+        );
+
+        return {
+          show: function () {
+            createNode( walletElm ).styles( getWidgetsStyle( widgetsStyle ) ).parts(
+              createNode ('div').text ('Amazon Pay').styles ({
+                fontWeight: 'bold',
+              })
+            );           
+          }
+        }
+      }
+    }
+
+    function getWidgetsStyle (styleObj) {
+      return styleObj || {
+        border: '1px solid #bbb',
+        borderRadius: '6px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '0 10px 0 10px',
+      };
     }
   }
   
-  function renderPayment (widgetsStyle) {
-    var walletElm = document.getElementById (
-      OffAmazonPayments.Widgets.getWalletElmId ()
-    );
-    createNode( walletElm ).styles( getWidgetsStyle( widgetsStyle ) ).parts(
-      createNode ('div').text ('Amazon Pay').styles ({
-        fontWeight: 'bold',
-      })
-    );
-  }  
   return {
-    showButton: function (createCheckoutSessionURL, buttonParams) {
-      renderButton (createCheckoutSessionURL, buttonParams);
+    showButton: function ( createCheckoutSessionURL, buttonParams ) {
+      payButton( createCheckoutSessionURL ).parameters( buttonParams );
     },
     getReturnURL: function () {
       var returnURL = amazon.Login.getReturnURL ();
@@ -393,12 +413,12 @@ var amazonpayV2Converter = ( function () {
         )
       }
     }) (),
-    showAddress: function (url, postJson, widgetsStyle, updateButtonStyle) {
-      renderAddress (url, this.getCheckoutSessionId(), postJson, widgetsStyle, updateButtonStyle);
+    showAddress: function ( url, postJson, widgetsStyle, updateButtonStyle ) {
+      payWidgets( widgetsStyle ).address( updateButtonStyle ).show( url, this.getCheckoutSessionId(), postJson );
       return this;
     },
-    showPayment: function (widgetsStyle) {
-      renderPayment( widgetsStyle );
+    showPayment: function ( widgetsStyle ) {
+      payWidgets( widgetsStyle ).payment().show();
       return this;
     }
   };
