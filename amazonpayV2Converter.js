@@ -72,7 +72,7 @@ var OffAmazonPayments = (function () {
     };
   }) ();
   
-  /** v1->v2 converter */
+/** v1->v2 converter */
 var amazonpayV2Converter = ( function () {
 
   if (window.onAmazonPaymentsReady) {
@@ -114,6 +114,8 @@ var amazonpayV2Converter = ( function () {
       return this;
     }
   };
+
+  /** functions */
   // This allows IE to use Object.assign method.
   function setObjectAssign () {
     if (!Object.assign) {
