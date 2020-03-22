@@ -75,13 +75,61 @@ var OffAmazonPayments = (function () {
 /** v1->v2 converter */
 var amazonpayV2Converter = ( function () {
 
-  if (window.onAmazonPaymentsReady) {
-    onAmazonPaymentsReady();
-  }
+  ( {
+    // This allows IE to use Object.assign method.
+    setObjectAssign: function () {
+      if (!Object.assign) {
+        Object.defineProperty (Object, 'assign', {
+          enumerable: false,
+          configurable: true,
+          writable: true,
+          value: function (target) {
+            if (target === undefined || target === null) {
+              throw new TypeError ('Cannot convert first argument to object');
+            }
+            var to = Object (target);
+            for (var i = 1; i < arguments.length; i++) {
+              var nextSource = arguments[i];
+              if (nextSource === undefined || nextSource === null) {
+                continue;
+              }
+              nextSource = Object (nextSource);
+              var keysArray = Object.keys (Object (nextSource));
+              for (
+                var nextIndex = 0, len = keysArray.length;
+                nextIndex < len;
+                nextIndex++
+              ) {
+                var nextKey = keysArray[nextIndex];
+                var desc = Object.getOwnPropertyDescriptor (nextSource, nextKey);
+                if (desc !== undefined && desc.enumerable) {
+                  to[nextKey] = nextSource[nextKey];
+                }
+              }
+            }
+            return to;
+          },
+        });
+      } 
+    },
+    // add stylesheet for loading icon
+    setLoadingIconStyle: function () {
+      var styleSheet = document.styleSheets[0];
+      var keyframes = '@keyframes loaderAnime {0% {transform: rotate(0deg);-ms-transform: rotate(0deg);-webkit-transform: rotate(0deg);-moz-transform: rotate(0deg);}100% {transform: rotate(360deg);-ms-transform: rotate(360deg);-webkit-transform: rotate(360deg);-moz-transform: rotate(360deg);}}';
+      styleSheet.insertRule( keyframes, styleSheet.cssRules.length );    
+    },
+    executeV1Script: function () {
+      if (window.onAmazonPaymentsReady) {
+        onAmazonPaymentsReady();
+      }
+    },
+    init: function () {
+      this.setObjectAssign();
+      this.setLoadingIconStyle();
+      this.executeV1Script();
+    }
+  } ).init();
 
-  setObjectAssign();
-  setLoadingIconStyle();
-  
   return {
     showButton: function ( createCheckoutSessionURL, buttonParams ) {
       payButton( createCheckoutSessionURL ).parameters( buttonParams );
@@ -105,8 +153,8 @@ var amazonpayV2Converter = ( function () {
         )
       }
     }) (),
-    showAddress: function ( url, postJson, widgetsStyle, updateButtonStyle ) {
-      payWidgets( widgetsStyle ).address( updateButtonStyle ).show( url, this.getCheckoutSessionId(), postJson );
+    showAddress: function ( getCheckoutSessionURL, widgetsStyle, updateButtonStyle ) {
+      payWidgets( widgetsStyle ).address( updateButtonStyle ).show( getCheckoutSessionURL, this.getCheckoutSessionId() );
       return this;
     },
     showPayment: function ( widgetsStyle ) {
@@ -116,43 +164,6 @@ var amazonpayV2Converter = ( function () {
   };
 
   /** functions */
-  // This allows IE to use Object.assign method.
-  function setObjectAssign () {
-    if (!Object.assign) {
-      Object.defineProperty (Object, 'assign', {
-        enumerable: false,
-        configurable: true,
-        writable: true,
-        value: function (target) {
-          if (target === undefined || target === null) {
-            throw new TypeError ('Cannot convert first argument to object');
-          }
-          var to = Object (target);
-          for (var i = 1; i < arguments.length; i++) {
-            var nextSource = arguments[i];
-            if (nextSource === undefined || nextSource === null) {
-              continue;
-            }
-            nextSource = Object (nextSource);
-            var keysArray = Object.keys (Object (nextSource));
-            for (
-              var nextIndex = 0, len = keysArray.length;
-              nextIndex < len;
-              nextIndex++
-            ) {
-              var nextKey = keysArray[nextIndex];
-              var desc = Object.getOwnPropertyDescriptor (nextSource, nextKey);
-              if (desc !== undefined && desc.enumerable) {
-                to[nextKey] = nextSource[nextKey];
-              }
-            }
-          }
-          return to;
-        },
-      });
-    } 
-  }
-
   // generate node
   function createNode (elem) {
     var element = !!elem && elem.nodeType === 1
@@ -195,23 +206,12 @@ var amazonpayV2Converter = ( function () {
     return element;
   }
 
-  // add stylesheet for loading icon
-  function setLoadingIconStyle () {
-    var styleSheet = document.styleSheets[0];
-    var keyframes = '@keyframes loaderAnime {0% {transform: rotate(0deg);-ms-transform: rotate(0deg);-webkit-transform: rotate(0deg);-moz-transform: rotate(0deg);}100% {transform: rotate(360deg);-ms-transform: rotate(360deg);-webkit-transform: rotate(360deg);-moz-transform: rotate(360deg);}}';
-    styleSheet.insertRule( keyframes, styleSheet.cssRules.length );    
-  }
-
   // post request
-  function post() {
-    var _url;
+  function post(url) {
+    var _url = url;
     var _request;
     var _output;
     return {
-      url: function (url) {
-        _url = url;
-        return this;
-      },
       request: function (obj) {
         _request = obj;
         return this;
@@ -328,13 +328,13 @@ var amazonpayV2Converter = ( function () {
           .parts( loadingElm ); // set loading icon  
                 
         return {
-          show: function (url, checkoutSessionId, postJson) {
-            postJson = postJson || {};
+          show: function (url, checkoutSessionId) {
             try {
-              var postParam = JSON.stringify (postJson);
-              post()
-                .url (url)
-                .request (postParam)
+              var postParam = JSON.stringify( {
+                "checkoutSessionId": checkoutSessionId
+              } );
+              post( url )
+                .request( postParam )
                 .output( function ( response ) {
                   addressNode.removeChild(addressNode.firstChild); // remove loading icon
                   if ( response && response.shippingAddress ) {
@@ -343,7 +343,7 @@ var amazonpayV2Converter = ( function () {
                     setErrorMessage( '住所情報を取得できません。他のお支払い方法をお選びください。', addressNode ); //TODO translate this error message
                   }
                 })
-                .exec ();
+                .exec();
             } catch ( e ) {
               console.error(e);
             }
