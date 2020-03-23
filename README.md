@@ -89,6 +89,8 @@ curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --head
 
 
 ```
+php/createCheckoutSession.php
+
 <?php
 
     $result = execute('https://XXXXXXXXX.execute-api.ap-northeast-1.amazonaws.com/AmazonPay', array("action" => "CreateCheckoutSession"));
@@ -129,6 +131,8 @@ curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --head
 
 
 ```
+php/getCheckoutSession.php
+
 <?php
     $requestJson = file_get_contents('php://input');
     $request = json_decode($requestJson);
@@ -178,8 +182,14 @@ async></script>
 <script src="https://static-fe.payments-amazon.com/checkout.js"></script>
 <script src="amazonpayV2Converter.js"></script>
 <script>
-var createCheckoutSessionURL = 'https://XXX';
-amazonpayV2Converter.sandbox().renderButton(createCheckoutSessionURL);
+var createCheckoutSessionUrl = `php/createCheckoutSession.php`; // TODO change your CreateCheckoutSession which you implement in 2-2.
+amazonpayV2Converter.showButton(createCheckoutSessionUrl, {
+  sandbox: true, 
+  ledgerCurrency: 'JPY',
+  checkoutLanguage: 'ja_JP',
+  productType: 'PayAndShip',
+  placement: 'Cart'
+});
 </script>
 <!-- add this tag -->
 
@@ -218,11 +228,8 @@ async></script>
 <script src="https://static-fe.payments-amazon.com/checkout.js"></script>
 <script src="amazonpayV2Converter.js"></script>
 <script>
-var getCheckoutSessionURL = 'https://XXX';
-amazonpayV2Converter.sandbox().showAddress(getCheckoutSessionURL, {
-          "action": "get",
-          "checkoutSessionId": amazonpayV2Converter.getCheckoutSessionId()
-        }).showPayment();
+var getCheckoutSessionUrl = 'php/getCheckoutSession.php'; // TODO change your getCheckoutSession which you implement in 2-2.
+amazonpayV2Converter.showAddress(getCheckoutSessionUrl).showPayment();
 </script>
 <!-- add this tag -->
 
