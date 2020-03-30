@@ -4,24 +4,41 @@ var OffAmazonPayments = ( function () {
   var amznBtnId;
   var merchantId;
   amazon.Login = ( function () {
-    var returnUrl;
+    var _returnUrl;
+    var _clientId;
     return {
       authorize: function ( loginOptions, url ) {
-        returnUrl = url;
+        _returnUrl = url;
       },
       getReturnUrl: function () {
-        return returnUrl;
+        return _returnUrl;
       },
+      setClientId: function (clientId) {
+        _clientId = clientId;
+      },
+      getClientId: function () {
+        return _clientId;
+      },
+      setUseCookie: function (cookie) {
+      }
     };
   } )();
   // widgets
   var walletElmId;
   var addressBookElmId;
+  var loginOps;
   return {
     Button: function ( id, mid, obj ) {
       amznBtnId = id;
       merchantId = mid;
       obj.authorization();
+      loginOps = loginOptions;
+    },
+    getLoginOptions: function () {
+      return loginOps;
+    },
+    getClientId: function () {
+      return amazon.Login.getClientId();
     },
     getBtnElmId: function () {
       return amznBtnId;
@@ -118,9 +135,10 @@ var amazonpayV2Converter = ( function () {
       styleSheet.insertRule( keyframes, styleSheet.cssRules.length );
     },
     executeV1Script: function () {
-      if ( window.onAmazonPaymentsReady ) {
+      if (window.onAmazonPaymentsReady)
         onAmazonPaymentsReady();
-      }
+      if (window.onAmazonLoginReady)
+        onAmazonLoginReady();
     },
     init: function () {
       this.setObjectAssign();
@@ -135,25 +153,14 @@ var amazonpayV2Converter = ( function () {
       button: function ( createCheckoutSessionUrl, buttonParams ) {
         // add loading div
         var payButton = document.getElementById( OffAmazonPayments.getBtnElmId() );
+        createNode( payButton ).styles( {
+          margin: 'auto',
+          position: 'relative'
+        });
+
         payButton.addEventListener( 'click', function () {
-          var loadingElm = createNode( 'div' ).styles( {
-            width: '1.5em',
-            height: '1.5em',
-            borderTop: '0.3em solid rgba(140, 139, 139, 0.5)',
-            borderRight: '0.3em solid rgba(140, 139, 139, 0.5)',
-            borderBottom: '0.3em solid rgba(140, 139, 139, 0.5)',
-            borderLeft: '0.3em solid rgba(255, 255, 255, 0.1)',
-            animation: 'loaderAnime 1s infinite linear',
-            borderRadius: '50%',
-            position: 'absolute',
-            top: '1em',
-            right: '0',
-            bottom: '0',
-            left: '0',
-            margin: 'auto',
-            zIndex: '10000'
-          } );
-          payButton.insertAdjacentElement( 'afterend', loadingElm );
+          document.getElementById( 'amazonpay-loading' ).style.visibility = 'visible';
+
           createNode( payButton ).styles( {
             pointerEvents: 'none',
             opacity: '0.4'
@@ -175,11 +182,38 @@ var amazonpayV2Converter = ( function () {
 
         renderConf.sandbox = buttonParams.sandbox ? true : false;
         amazon.Pay.renderButton( '#' + OffAmazonPayments.getBtnElmId(), renderConf );
+        
+        var buttonHeight = payButton.offsetHeight || 10;
+        var loadingTop = buttonHeight / 2;
+
+        var loadingElm = createNode( 'div' )
+          .attrs( {
+            id: 'amazonpay-loading'
+          })
+          .styles( {
+          width: '10px',
+          height: '10px',
+          borderTop: '3px solid rgba(140, 139, 139, 0.5)',
+          borderRight: '3px solid rgba(140, 139, 139, 0.5)',
+          borderBottom: '3px solid rgba(140, 139, 139, 0.5)',
+          borderLeft: '3px solid rgba(255, 255, 255, 0.1)',
+          animation: 'loaderAnime 1s infinite linear',
+          borderRadius: '50%',
+          position: 'relative',
+          top: - loadingTop + 'px',
+          right: '0',
+          bottom: '0',
+          left: '0',
+          margin: 'auto',
+          zIndex: '10000',
+          visibility: 'hidden'
+        } );
+        payButton.insertAdjacentElement( 'afterend', loadingElm );
       },
       address: function ( setting ) {
         setting = setting || {};
         var widgetsStyle = getWidgetsStyle( setting.widgetsStyle );
-        var updateButtonStyle = getUpdateButton( setting.updateButtonStyle );
+        var updateButtonStyle = getUpdateButton( setting.updateButtonStyle, 'updateCheckoutDetails' );
 
         var addressElm = document.getElementById(
           OffAmazonPayments.Widgets.getAddressElmId()
@@ -255,27 +289,6 @@ var amazonpayV2Converter = ( function () {
             }
           }
         }
-
-        function getUpdateButton ( styleObj ) {
-          var updateButtonStyle = styleObj || {
-            display: 'block',
-            position: 'relative',
-            fontSize: '1rem',
-            padding: '.375rem .75rem',
-            textAlign: 'center',
-            lineHeight: '1.5',
-            borderRadius: '.25rem',
-            color: '#fff',
-            background: '#6c757d',
-          }
-
-          return createNode( 'button' )
-            .styles( updateButtonStyle )
-            .attrs( {
-              id: 'updateCheckoutDetails',
-            } )
-            .text( '変更' );//TODO translate this error message
-        }
       },
       payment: function ( setting ) {
         setting = setting || {};
@@ -285,13 +298,28 @@ var amazonpayV2Converter = ( function () {
           OffAmazonPayments.Widgets.getWalletElmId()
         );
 
+        var walletNode = createNode(walletElm)
+          .styles(widgetsStyle);
+
+        var updateButtonStyle = getUpdateButton(setting.updateButtonStyle, 'updateWalletDetails');
+        
+        walletNode.setUpdateButton = function ( checkoutSessionId, updateButtonStyle ) {
+          walletNode.parts( updateButtonStyle );
+
+          amazon.Pay.bindChangeAction( '#updateWalletDetails', {
+            amazonCheckoutSessionId: checkoutSessionId,
+            changeAction: 'changePayment',
+          } );
+        }
+        
         return {
-          show: function () {
-            createNode( walletElm ).styles( widgetsStyle ).parts(
+          show: function (checkoutSessionId) {
+            walletNode.parts(
               createNode( 'div' ).text( 'Amazon Pay' ).styles( {
                 fontWeight: 'bold',
               } )
             );
+            walletNode.setUpdateButton(checkoutSessionId, updateButtonStyle);
           }
         }
       }
@@ -306,6 +334,27 @@ var amazonpayV2Converter = ( function () {
         alignItems: 'center',
         padding: '0 10px 0 10px',
       };
+    }
+
+    function getUpdateButton ( styleObj, domId ) {
+      var updateButtonStyle = styleObj || {
+        display: 'block',
+        position: 'relative',
+        fontSize: '1rem',
+        padding: '.375rem .75rem',
+        textAlign: 'center',
+        lineHeight: '1.5',
+        borderRadius: '.25rem',
+        color: '#fff',
+        background: '#6c757d',
+      }
+
+      return createNode( 'button' )
+        .styles( updateButtonStyle )
+        .attrs( {
+          id: domId,
+        } )
+        .text( '変更' );//TODO translate this error message
     }
   } )();
 
@@ -407,6 +456,12 @@ var amazonpayV2Converter = ( function () {
         ? returnUrl
         : window.location.origin + '/' + returnUrl;
     },
+    getLoginOptions: function() {
+      return OffAmazonPayments.getLoginOptions();
+    },
+    getClientId: function () {
+      return OffAmazonPayments.getClientId();
+    },
     getCheckoutSessionId: ( function () {
       var amazonCheckoutSessionId = null;
       return function () {
@@ -428,10 +483,11 @@ var amazonpayV2Converter = ( function () {
         .show( getCheckoutSessionUrl, this.getCheckoutSessionId() );
       return this;
     },
-    showPayment: function ( widgetsStyle ) {
+    showPayment: function ( widgetsStyle, updateButtonStyle ) {
       amazonPayWidgets.payment( {
-        widgetsStyle: widgetsStyle
-      } ).show();
+        widgetsStyle: widgetsStyle,
+        updateButtonStyle: updateButtonStyle
+      }).show(this.getCheckoutSessionId());
       return this;
     }
   };
