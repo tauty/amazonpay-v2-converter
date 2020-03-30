@@ -46,7 +46,7 @@ You can easily convert v1 into v2 by just using this sample code.
 <img src="https://user-images.githubusercontent.com/61146815/75250132-01749400-581b-11ea-8b14-baf329cb5c4e.png" width="500px">
 
 #### input these fields and click 'next' buttion
-<img src="https://user-images.githubusercontent.com/61146815/75250647-23224b00-581c-11ea-89e3-3f49ffd644b8.png" width="500px">
+<img src="https://user-images.githubusercontent.com/61146815/77886956-b67bef80-72a4-11ea-96e1-5a6b69ced038.png" width="500px">
 
 #### click 'next' button
 <img src="https://user-images.githubusercontent.com/61146815/75250883-bfe4e880-581c-11ea-9b54-161ea2c5265b.png" width="500px">
@@ -60,10 +60,10 @@ You can easily convert v1 into v2 by just using this sample code.
 #### get `API Endpoint` and `API Key` after all events are completed
 
 ##### API Endpoint
-<img src="https://user-images.githubusercontent.com/61146815/75626288-ad4a2500-5c09-11ea-89b5-a510ac03bbec.png" width="500px">
+<img src="https://user-images.githubusercontent.com/61146815/77887212-29856600-72a5-11ea-9d7a-209b8f20ce5d.png" width="500px">
 
 ##### API Key
-<span><img src="https://user-images.githubusercontent.com/61146815/75626305-d10d6b00-5c09-11ea-810f-182a4e403729.png" width="500px"><img src="https://user-images.githubusercontent.com/61146815/75364465-204c5680-58ff-11ea-983a-d1b2871d9e79.png" width="200px">
+<span><img src="https://user-images.githubusercontent.com/61146815/77887260-41f58080-72a5-11ea-91cb-1056e2033b8e.png" width="500px"><img src="https://user-images.githubusercontent.com/61146815/75364465-204c5680-58ff-11ea-983a-d1b2871d9e79.png" width="200px">
 </span>
 
 #### test the connection by using `API Endpoint` and `API Key`
