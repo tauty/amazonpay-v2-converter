@@ -59,20 +59,28 @@ You can easily convert v1 into v2 by just using this sample code.
 
 #### get `API Endpoint` and `API Key` after all events are completed
 
-##### API Endpoint
+##### API Endpoint（*1）
 <img src="https://user-images.githubusercontent.com/61146815/77887212-29856600-72a5-11ea-9d7a-209b8f20ce5d.png" width="500px">
 
-##### API Key
+##### API Key(*2)
 <span><img src="https://user-images.githubusercontent.com/61146815/77887260-41f58080-72a5-11ea-91cb-1056e2033b8e.png" width="500px"><img src="https://user-images.githubusercontent.com/61146815/75364465-204c5680-58ff-11ea-983a-d1b2871d9e79.png" width="200px">
 </span>
 
 #### test the connection by using `API Endpoint` and `API Key`
 
+|parameters|how to prepare|
+|---|---|
+|STORE_ID|SellerCentral > Amazon Login > Web settings > clientId|
+|CHECKOUT_REVIEW_RETURN_URL|Use the checkoutReviewReturnUrl parameter to specify the URL which the buyer is redirected to, after they select their preferred shipping address and payment method.<br> [Ref: Create an Amazon Pay checkout session](https://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-checkout/add-the-amazon-pay-button.html#1-create-an-amazon-pay-checkout-session)|
+|API_KEY|refer to ```API Endpoint(*1)```|
+|API_ENDPOINT|refer to ```API Key(*2)```|
+
+
 ```
-curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --header 'x-api-key:${API Key}' ${API Endpoint}
+curl -X POST -H "Content-Type: application/json" -d '{"action": "CreateCheckoutSession", "webCheckoutDetail": {"checkoutReviewReturnUrl":"CHECKOUT_REVIEW_RETURN_URL"},"storeId":"STORE_ID"}' --header 'x-api-key:API_KEY' API_ENDPOINT
 
 ex.
-curl -X POST -H "Content-Type: application/json" -d '{"action":"create"}' --header 'x-api-key:XXXXXXXXXXXXXXXXXXXXXXXXXX' https://XXXXXXXXX.execute-api.ap-northeast-1.amazonaws.com/AmazonPay/
+curl -X POST -H "Content-Type: application/json" -d '{"action": "CreateCheckoutSession", "webCheckoutDetail": {"checkoutReviewReturnUrl":"http://XXX.html"},"storeId":"amzn1.application-oa2-client.XXX"}' --header 'x-api-key:EBd23jGr5PXXX' https://XXX.execute-api.ap-northeast-1.amazonaws.com/AmazonPay/
 ```
 
 <br/>
